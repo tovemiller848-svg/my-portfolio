@@ -4,285 +4,212 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>叶湘榕 | 个人作品集</title>
-    
-    <script src="https://cdn.staticfile.org/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdn.staticfile.org/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.staticfile.org/babel-standalone/7.21.4/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <style>
         @import url('https://fonts.loli.net/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap');
-        
-        body { background-color: #050505; margin: 0; overflow-x: hidden; color: white; }
-        .font-sans { font-family: 'Inter', sans-serif; }
+        body { background-color: #050505; color: white; margin: 0; overflow-x: hidden; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-        
-        .glass-panel { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-        }
-
-        .software-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-        }
-
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #DA205A; border-radius: 10px; }
-        
-        /* 手机端彻底禁用鼠标特效，防止崩溃 */
-        @media (max-width: 768px) {
-            #cursor { display: none !important; }
-            body { cursor: auto !important; }
-        }
+        @keyframes blink { 50% { opacity: 0; } }
+        .cursor-blink::after { content: '_'; animation: blink 1s step-end infinite; }
+        canvas { position: fixed; top: 0; left: 0; pointer-events: none; }
+        #cursor { width: 12px; height: 12px; background: #DA205A; border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; box-shadow: 0 0 15px #DA205A; display: none; }
+        @media (min-width: 768px) { #cursor { display: block; } body { cursor: none; } }
+        .modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
+        .modal.active { display: flex; }
+        .software-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; text-align: center; font-weight: 900; font-size: 12px; }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="custom-scrollbar">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-        const THEME = { bg: '#050505', primary: '#DA205A' };
+    <div id="cursor"></div>
+    <canvas id="waveCanvas" style="z-index: 0;"></canvas>
+    <canvas id="starCanvas" style="z-index: 10;"></canvas>
 
-        // --- 100% 还原所有数据 ---
-        const SOFTWARE_TOOLS = [
-            { name: 'Ps', color: '#31A8FF' }, { name: 'Ai', color: '#FF9A00' },
-            { name: 'CAD', color: '#FF4C4C' }, { name: '秀米', color: '#FF5959' },
-            { name: 'Canva', color: '#00C4CC' }, { name: 'AIGC', color: '#8B5CF6' }
+    <main class="relative z-20">
+        <section class="h-screen flex flex-col items-center justify-center text-center px-4">
+            <h1 class="font-black text-[12vw] md:text-[10vw] leading-none uppercase">作品集<br/><span style="color: #DA205A;">网站</span></h1>
+            <p id="typingText" class="font-mono text-gray-400 mt-8 tracking-[0.4em] text-lg uppercase cursor-blink"></p>
+        </section>
+
+        <section id="about" class="py-24 px-6 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
+            <div class="md:col-span-4 lg:sticky lg:top-24">
+                <div class="glass-panel p-8 text-center">
+                    <div class="w-40 h-52 mx-auto rounded-xl overflow-hidden mb-6 bg-white/5 border border-white/10 shadow-2xl">
+                        <img src="./zheng-jian-zhao.jpg" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/160x208/222/white?text=Profile'">
+                    </div>
+                    <h3 class="text-3xl font-black">叶湘榕</h3>
+                    <p class="text-[#DA205A] font-mono text-xs mt-2 uppercase tracking-widest">Designer / 2003.12.23</p>
+                    <div class="grid grid-cols-3 gap-2 mt-8" id="softwareTools"></div>
+                </div>
+            </div>
+            <div class="md:col-span-8 space-y-10">
+                <div class="glass-panel p-8 border-l-4 border-[#DA205A]">
+                    <h2 class="text-2xl font-black mb-2">福建江夏学院</h2>
+                    <p class="text-[#DA205A] font-mono mb-4">艺术设计学 | 2022 - 2026</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">主修课程：设计调研方法、消费者行为学、空间信息可视化、设计市场与企业考察等。</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="skillSystem"></div>
+            </div>
+        </section>
+
+        <section id="work" class="py-24 px-6 max-w-7xl mx-auto">
+            <h2 class="text-6xl md:text-8xl font-black uppercase mb-20 tracking-tighter opacity-20">精选作品.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="projectGrid"></div>
+        </section>
+
+        <footer id="contact" class="py-32 border-t border-white/5 text-center bg-black/50">
+            <h2 class="text-4xl font-black mb-16 tracking-widest uppercase">联系我</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-6" id="contactList"></div>
+            <p class="mt-24 text-[10px] text-gray-600 font-mono uppercase tracking-[0.5em]">© 2026 YE XIANG RONG</p>
+        </footer>
+    </main>
+
+    <div id="projectModal" class="modal justify-center items-center p-4">
+        <div class="absolute inset-0" onclick="closeModal()"></div>
+        <div class="relative w-full max-w-6xl h-[85vh] bg-[#050505] overflow-y-auto border border-white/10 rounded-3xl custom-scrollbar z-10">
+            <div id="modalContent" class="p-8 md:p-16"></div>
+            <button class="fixed top-8 right-8 text-white text-3xl glass-panel w-12 h-12 flex items-center justify-center hover:bg-[#DA205A] transition-colors" onclick="closeModal()">✕</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 数据配置 ---
+        const TOOLS = [
+            {n:'Ps', c:'#31A8FF'}, {n:'Ai', c:'#FF9A00'}, {n:'CAD', c:'#FF4C4C'},
+            {n:'秀米', c:'#FF5959'}, {n:'Canva', c:'#00C4CC'}, {n:'AIGC', c:'#8B5CF6'}
         ];
-
         const SKILLS = [
-            { title: '视觉与图形设计', desc: 'Photoshop, Illustrator, Canva' },
-            { title: 'AIGC 辅助设计', desc: 'AI Design Tools, Efficiency' },
-            { title: '数据分析与监控', desc: 'Data Review, Analysis' },
-            { title: '运营统筹与排版', desc: '秀米, Word, Excel, PowerPoint' }
+            {t:'视觉与图形设计', d:'Photoshop, Illustrator, Canva'},
+            {t:'AIGC 辅助设计', d:'AI Design Tools, Efficiency'},
+            {t:'数据分析与监控', d:'Data Review, Analysis'},
+            {t:'运营统筹与排版', d:'秀米, Word, Excel, PowerPoint'}
         ];
-
         const PROJECTS = [
-            { 
-                id: 1, title: '品牌ip形象设计', img: './yunda_cover.jpg', desc: 'Ps/Gemini/Lovart',
-                details: ['./yunda_cover.jpg', './yunda_2.jpg', './yunda_3.jpg', './yunda_4.jpg', './yunda_5.jpg', './yunda_6.jpg', './yunda_7.jpg', './yunda_8.jpg']
-            },
-            { 
-                id: 2, title: '企业宣传手册设计', img: './layout-1.jpg', desc: 'Ps/Deepseek',
-                details: ['./layout-1.jpg', './layout-2.jpg', './layout-3.jpg', './layout-4.jpg', './layout-5.jpg', './layout-6.jpg']
-            },
+            { id: 1, title: '品牌ip形象设计', img: './yunda_cover.jpg', desc: 'Ps/Gemini/Lovart', detail: ['./yunda_cover.jpg', './yunda_2.jpg', './yunda_3.jpg', './yunda_4.jpg', './yunda_5.jpg', './yunda_6.jpg', './yunda_7.jpg', './yunda_8.jpg'] },
+            { id: 2, title: '企业宣传手册设计', img: './layout-1.jpg', desc: 'Ps/Deepseek', detail: ['./layout-1.jpg', './layout-2.jpg', './layout-3.jpg', './layout-4.jpg', './layout-5.jpg', './layout-6.jpg'] },
             { 
                 id: 3, title: '公众号运营', img: './666shots-so.png', desc: '可画/秀米/135编辑器',
                 isCustom: true,
                 sections: [
-                    { title: '海报设计', sub: '公众号视觉', role: '设计', color: '#2DDB84', img: './666shots-so.png', desc: '提取核心元素进行视觉重构。' },
+                    { title: '海报设计', sub: '公众号视觉', role: '设计', color: '#2DDB84', img: './666shots-so.png', desc: '提取传统文化核心元素进行视觉重构。' },
                     { title: '排版案例', sub: '公众号推文', role: '排版', color: '#FFD166', img: './guoqin1.jpg', isScroll: true, desc: '模块化设计与视觉动线引导。' },
-                    { title: '& 交互', sub: '活动转化', role: '链路', color: '#FF5E3A', img: './3.png', desc: '将普通链接转化为交互入口。' }
+                    { title: '& 尾部交互', sub: '活动转化', role: '链路', color: '#FF5E3A', img: './3.png', desc: '将普通链接转化为极具点击欲望的交互入口。' }
                 ]
             }
         ];
 
-        function App() {
-            const [heroOp, setHeroOp] = useState(1);
-            const [bgOp, setBgOp] = useState(0);
-            const [typed, setTyped] = useState('');
-            const [activeProj, setActiveProj] = useState(null);
-            
-            const starRef = useRef(null);
-            const waveRef = useRef(null);
-            const mouse = useRef({ x: -1000, y: -1000, active: false });
+        // --- 核心逻辑 ---
+        window.onload = () => {
+            // 1. 打字机
+            const text = "艺术设计学"; let idx = 0;
+            const typing = setInterval(() => {
+                document.getElementById('typingText').innerText = text.slice(0, idx);
+                if(++idx > text.length) clearInterval(typing);
+            }, 150);
 
-            // 打字机
-            useEffect(() => {
-                let i = 0; const full = "艺术设计学";
-                const t = setInterval(() => { setTyped(full.slice(0, i)); i++; if(i > full.length) clearInterval(t); }, 150);
-                return () => clearInterval(t);
-            }, []);
+            // 2. 渲染静态内容
+            document.getElementById('softwareTools').innerHTML = TOOLS.map(t => `<div class="software-card" style="color:${t.c}">${t.n}</div>`).join('');
+            document.getElementById('skillSystem').innerHTML = SKILLS.map(s => `<div class="glass-panel p-6"><h4 class="text-[#DA205A] font-bold text-sm mb-2 uppercase">${s.t}</h4><p class="text-gray-500 text-[10px] font-mono">${s.d}</p></div>`).join('');
+            document.getElementById('projectGrid').innerHTML = PROJECTS.map(p => `
+                <div class="glass-panel overflow-hidden cursor-pointer group" onclick="openProject(${p.id})">
+                    <div class="h-60 overflow-hidden"><img src="${p.img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"></div>
+                    <div class="p-6 bg-[#0a0a0a]"><h3 class="font-bold text-xl">${p.title}</h3><p class="text-[10px] text-gray-500 font-mono mt-1">${p.desc}</p></div>
+                </div>
+            `).join('');
+            document.getElementById('contactList').innerHTML = [
+                {l:'Phone', v:'13655004586'}, {l:'Email', v:'13655004586@163.com'}, {l:'WeChat', v:'kotove03012'}
+            ].map(c => `<div class="glass-panel p-8"><span class="text-gray-500 text-[10px] font-mono uppercase tracking-widest">${c.l}</span><div class="font-bold text-lg mt-2 break-all">${c.v}</div></div>`).join('');
 
-            // 渲染背景 (针对手机优化：如果手机很卡，这段代码会自动降低频率)
-            useEffect(() => {
-                const isMob = window.innerWidth < 768;
-                const starCvs = starRef.current;
-                const waveCvs = waveRef.current;
-                if(!starCvs || !waveCvs) return;
+            // 3. 背景引擎 (星星 & 波浪)
+            initBackgrounds();
+        };
 
-                const sctx = starCvs.getContext('2d');
-                const wctx = waveCvs.getContext('2d');
-                let w, h;
-                
-                const resize = () => {
-                    w = starCvs.width = waveCvs.width = window.innerWidth;
-                    h = starCvs.height = waveCvs.height = window.innerHeight;
-                };
-                window.addEventListener('resize', resize); resize();
+        function initBackgrounds() {
+            const starCvs = document.getElementById('starCanvas');
+            const waveCvs = document.getElementById('waveCanvas');
+            const sctx = starCvs.getContext('2d');
+            const wctx = waveCvs.getContext('2d');
+            let w, h; const isMob = window.innerWidth < 768;
 
-                // 1. 星星数据
-                const pts = [];
-                const count = isMob ? 100 : 600;
-                for(let i=0; i<count; i++) {
-                    const r = 400 * Math.cbrt(Math.random());
-                    const t = Math.random()*Math.PI*2;
-                    const p = Math.acos(Math.random()*2-1);
-                    pts.push({ ox: r*Math.sin(p)*Math.cos(t), oy: r*Math.sin(p)*Math.sin(t), oz: r*Math.cos(p), wx:0, wy:0, wz:0, vx:0, vy:0, vz:0 });
+            const resize = () => { w = starCvs.width = waveCvs.width = window.innerWidth; h = starCvs.height = waveCvs.height = window.innerHeight; };
+            window.addEventListener('resize', resize); resize();
+
+            const pts = []; const count = isMob ? 80 : 400;
+            for(let i=0; i<count; i++) {
+                const r = 400 * Math.cbrt(Math.random());
+                const t = Math.random()*Math.PI*2;
+                const p = Math.acos(Math.random()*2-1);
+                pts.push({ ox: r*Math.sin(p)*Math.cos(t), oy: r*Math.sin(p)*Math.sin(t), oz: r*Math.cos(p), wx:0, wy:0, wz:0 });
+            }
+
+            let ang = 0, time = 0;
+            const animate = () => {
+                ang += 0.001; time += 0.005;
+                const scroll = window.pageYOffset || document.documentElement.scrollTop;
+                const starOp = Math.max(0, 1 - scroll/500);
+                const waveOp = Math.min(1, scroll/400);
+
+                // Wave
+                wctx.fillStyle = '#050505'; wctx.fillRect(0,0,w,h);
+                wctx.globalAlpha = waveOp;
+                for(let i=0; i<8; i++) {
+                    wctx.beginPath(); const by = h*0.2 + (h*0.7/8)*i;
+                    for(let x=0; x<=w; x+=isMob?80:40) {
+                        const y = by + Math.sin(x*0.002 + time + i*0.4)*35;
+                        if(x===0) wctx.moveTo(x,y); else wctx.lineTo(x,y);
+                    }
+                    wctx.strokeStyle = `rgba(218,32,90,${0.04 + i*0.01})`; wctx.stroke();
                 }
 
-                let ang = 0, time = 0;
-                const render = () => {
-                    ang += 0.001; time += 0.005;
-                    
-                    // 画波浪 (底层)
-                    wctx.fillStyle = '#050505'; wctx.fillRect(0,0,w,h);
-                    for(let i=0; i<10; i++) {
-                        wctx.beginPath();
-                        const by = h*0.2 + (h*0.7/10)*i;
-                        for(let x=0; x<=w; x+=isMob?60:30) {
-                            const y = by + Math.sin(x*0.002 + time + i*0.3)*40;
-                            if(x===0) wctx.moveTo(x,y); else wctx.lineTo(x,y);
-                        }
-                        wctx.strokeStyle = `rgba(218,32,90,${0.03 + i*0.01})`;
-                        wctx.stroke();
-                    }
-
-                    // 画星星 (顶层)
-                    sctx.clearRect(0,0,w,h);
-                    pts.forEach(p => {
-                        const cosY = Math.cos(ang), sinY = Math.sin(ang);
-                        const tx = p.ox*cosY - p.oz*sinY, tz = p.ox*sinY + p.oz*cosY;
-                        p.wx += (tx - p.wx)*0.05; p.wz += (tz - p.wz)*0.05;
-                        const sc = 500/(500+p.wz), x = p.wx*sc+w/2, y = p.oy*sc+h/2;
-                        sctx.globalAlpha = Math.max(0, sc-0.3);
-                        sctx.fillStyle = THEME.primary;
-                        sctx.fillRect(x, y, 2*sc, 2*sc);
-                    });
-                    requestAnimationFrame(render);
-                };
-                render();
-                return () => window.removeEventListener('resize', resize);
-            }, []);
-
-            return (
-                <div onScroll={(e) => {
-                    const s = e.target.scrollTop;
-                    setHeroOp(Math.max(0, 1 - s/500));
-                    setBgOp(Math.min(1, s/400));
-                }} className="relative w-full h-screen overflow-y-auto custom-scrollbar bg-black">
-                    
-                    {/* 背景层 */}
-                    <canvas ref={waveRef} className="fixed inset-0 z-0 pointer-events-none" style={{opacity: bgOp}} />
-                    <canvas ref={starRef} className="fixed inset-0 z-10 pointer-events-none" style={{opacity: heroOp}} />
-
-                    <main className="relative z-20">
-                        {/* 1. 英雄页 */}
-                        <section className="h-screen flex flex-col items-center justify-center text-center px-4">
-                            <h1 className="font-sans font-black text-[12vw] md:text-[10vw] leading-tight">个人作品集<br/><span className="text-[#DA205A]">网站</span></h1>
-                            <p className="font-mono text-gray-400 mt-6 tracking-[0.4em] text-lg uppercase">{typed}_</p>
-                        </section>
-
-                        {/* 2. 关于我：含照片、工具、技能 */}
-                        <section id="about" className="py-24 px-6 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
-                            <div className="md:col-span-4 lg:sticky lg:top-24">
-                                <div className="glass-panel p-8 rounded-3xl text-center">
-                                    <div className="w-40 h-52 mx-auto rounded-xl overflow-hidden mb-6 bg-white/5 border border-white/10">
-                                        <img src="./zheng-jian-zhao.jpg" className="w-full h-full object-cover" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold">叶湘榕</h3>
-                                    <div className="grid grid-cols-3 gap-2 mt-8">
-                                        {SOFTWARE_TOOLS.map(s => (
-                                            <div key={s.name} className="software-card aspect-square rounded-lg flex items-center justify-center text-[10px] font-bold" style={{color: s.color}}>{s.name}</div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="md:col-span-8 space-y-10">
-                                <div className="glass-panel p-8 rounded-2xl border-l-4 border-[#DA205A]">
-                                    <h2 className="text-xl font-bold mb-2">福建江夏学院</h2>
-                                    <p className="text-[#DA205A] font-mono text-sm mb-4">艺术设计学 | 2022.9 - 2026.6</p>
-                                    <p className="text-gray-400 text-sm leading-relaxed">主修课程：设计调研方法、消费者行为学、空间信息可视化、设计市场与企业考察。</p>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {SKILLS.map(s => (
-                                        <div key={s.title} className="glass-panel p-6 rounded-xl">
-                                            <h4 className="text-[#DA205A] font-bold text-sm mb-2">{s.title}</h4>
-                                            <p className="text-gray-500 text-[10px] font-mono">{s.desc}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* 3. 精选作品 */}
-                        <section id="work" className="py-24 px-6 max-w-7xl mx-auto">
-                            <h2 className="text-5xl font-black mb-16 tracking-tighter">精选作品.</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                {PROJECTS.map(p => (
-                                    <div key={p.id} onClick={() => setActiveProj(p)} className="glass-panel rounded-2xl overflow-hidden cursor-pointer group">
-                                        <div className="h-56 overflow-hidden">
-                                            <img src={p.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                        </div>
-                                        <div className="p-6 bg-[#0a0a0a]">
-                                            <h3 className="font-bold text-lg">{p.title}</h3>
-                                            <p className="text-[10px] text-gray-500 mt-1 uppercase font-mono">{p.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* 4. 联系 */}
-                        <footer id="contact" className="py-32 border-t border-white/5 text-center">
-                            <h2 className="text-3xl font-black mb-12 tracking-widest uppercase">联系我</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto px-6">
-                                {[ {l:'Phone', v:'13655004586'}, {l:'Email', v:'13655004586@163.com'}, {l:'WeChat', v:'kotove03012'} ].map(i => (
-                                    <div key={i.l} className="glass-panel p-8 rounded-2xl">
-                                        <span className="text-gray-600 text-[10px] font-mono uppercase tracking-widest">{i.l}</span>
-                                        <div className="font-bold mt-2 break-all">{i.v}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <p className="mt-24 text-[10px] text-gray-700 font-mono uppercase tracking-[0.4em]">© 2026 YE XIANG RONG</p>
-                        </footer>
-                    </main>
-
-                    {/* 详情弹窗 */}
-                    {activeProj && (
-                        <div className="fixed inset-0 z-[100] flex justify-center items-center p-4">
-                            <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setActiveProj(null)}></div>
-                            <div className="relative w-full max-w-5xl h-[85vh] bg-[#050505] overflow-y-auto border border-white/10 rounded-2xl custom-scrollbar">
-                                <div className="p-8 md:p-16">
-                                    <h2 className="text-3xl font-black mb-10">{activeProj.title}</h2>
-                                    {!activeProj.isCustom ? (
-                                        <div className="space-y-6 pb-10">
-                                            {activeProj.details.map((img, i) => <img key={i} src={img} className="w-full rounded-xl" loading="lazy" />)}
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-24 pb-10">
-                                            {activeProj.sections.map((s, i) => (
-                                                <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                                                    <div className={`bg-[#0a0a0a] rounded-xl overflow-y-auto border border-white/5 ${s.isScroll ? 'h-[50vh]' : 'h-auto'}`}>
-                                                        <img src={s.img} className="w-full h-auto" loading="lazy" />
-                                                    </div>
-                                                    <div className="space-y-4">
-                                                        <h4 className="font-black text-xl text-[#DA205A] uppercase">{s.sub}</h4>
-                                                        <p className="text-gray-400 text-sm font-mono leading-relaxed">{s.desc}</p>
-                                                        <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Role: {s.role}</div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <button className="absolute top-6 right-6 text-white text-2xl" onClick={() => setActiveProj(null)}>✕</button>
-                            </div>
-                        </div>
-                    )}
-                    
-                    <div id="cursor" className="fixed top-0 left-0 w-3 h-3 bg-[#DA205A] rounded-full pointer-events-none z-[1000] shadow-[0_0_15px_#DA205A]"></div>
-                </div>
-            );
+                // Stars
+                sctx.clearRect(0,0,w,h);
+                sctx.globalAlpha = starOp;
+                pts.forEach(p => {
+                    const cosY = Math.cos(ang), sinY = Math.sin(ang);
+                    const tx = p.ox*cosY - p.oz*sinY, tz = p.ox*sinY + p.oz*cosY;
+                    p.wx += (tx - p.wx)*0.05; p.wz += (tz - p.wz)*0.05;
+                    const sc = 500/(500+p.wz), x = p.wx*sc+w/2, y = p.oy*sc+h/2;
+                    sctx.fillStyle = '#DA205A'; sctx.globalAlpha = (sc-0.3)*starOp;
+                    sctx.fillRect(x, y, 2*sc, 2*sc);
+                });
+                requestAnimationFrame(animate);
+            };
+            animate();
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        function openProject(id) {
+            const p = PROJECTS.find(item => item.id === id);
+            let html = `<h2 class="text-4xl font-black mb-12">${p.title}</h2>`;
+            if(p.isCustom) {
+                html += `<div class="space-y-32 pb-10">${p.sections.map(s => `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div class="bg-[#0a0a0a] rounded-2xl overflow-y-auto border border-white/10 ${s.isScroll?'h-[55vh]':'h-auto'}">
+                            <img src="${s.img}" class="w-full h-auto">
+                        </div>
+                        <div class="space-y-6">
+                            <h4 class="font-black text-2xl uppercase" style="color:${s.color}">${s.sub}</h4>
+                            <p class="text-gray-400 font-mono leading-relaxed text-sm">${s.desc}</p>
+                            <div class="text-[10px] font-bold text-gray-500 tracking-widest">ROLE: ${s.role}</div>
+                        </div>
+                    </div>
+                `).join('')}</div>`;
+            } else {
+                html += `<div class="space-y-8 pb-10">${p.detail.map(img => `<img src="${img}" class="w-full rounded-2xl shadow-2xl">`).join('')}</div>`;
+            }
+            document.getElementById('modalContent').innerHTML = html;
+            document.getElementById('projectModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
 
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 鼠标跟随
         document.addEventListener('mousemove', (e) => {
             const c = document.getElementById('cursor');
             if(c) c.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
