@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>叶湘榕 | 个人作品集</title>
-    
     <script src="https://cdn.staticfile.org/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdn.staticfile.org/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.staticfile.org/babel-standalone/7.21.4/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <style>
         @import url('https://fonts.loli.net/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono:wght@400;700&display=swap');
         body { background-color: #050505; margin: 0; overflow: hidden; cursor: none; }
@@ -55,9 +53,9 @@
             { 
                 id: 3, title: '公众号运营', img: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1000&auto=format&fit=crop', desc: '可画/秀米/135编辑器',
                 customSections: [
-                    { layout: 'image-left', engTitle: 'Poster Design', subTitle: '公众号视觉', title: '海报设计', desc: '结合现代排版进行视觉重构。', role: '视觉策划 / 设计', colors: ['#1A4E35', '#DF8435'], titleColor: '#2DDB84', imageUrl: './666shots-so.png' },
-                    { layout: 'image-right-scroll', engTitle: 'Article Design', subTitle: '公众号推文', title: '排版案例', desc: '模块化设计与视觉动线引导。', role: '排版 / 动线规划', colors: ['#F1E8D7', '#D44D41'], titleColor: '#FFD166', imageUrl: './guoqin1.jpg' },
-                    { layout: 'image-left', engTitle: 'Conversion Design', subTitle: '活动转化链路', title: '& 交互设计', desc: '将普通链接图转化为交互入口。', role: '视觉排版 / 链路设计', colors: ['#FF4500'], titleColor: '#FF5E3A', imageUrl: './3.png' }
+                    { layout: 'image-left', engTitle: 'Poster Design', subTitle: '公众号视觉', title: '海报设计', desc: '提取传统文化核心元素，结合现代排版重构。', role: '设计', colors: ['#1A4E35', '#DF8435'], titleColor: '#2DDB84', imageUrl: './666shots-so.png' },
+                    { layout: 'image-right-scroll', engTitle: 'Article Design', subTitle: '公众号推文', title: '排版案例', desc: '模块化设计与视觉动线引导。', role: '排版 / 动线', colors: ['#F1E8D7', '#D44D41'], titleColor: '#FFD166', imageUrl: './guoqin1.jpg' },
+                    { layout: 'image-left', engTitle: 'Conversion Design', subTitle: '活动转化', title: '& 交互交互', desc: '将普通链接转化为极具点击欲望的入口。', role: '链路设计', colors: ['#FF4500'], titleColor: '#FF5E3A', imageUrl: './3.png' }
                 ]
             }
         ];
@@ -144,35 +142,21 @@
                     const op = Math.max(0, 1 - s / (h * 0.5)); setHeroOpacity(op); opacityRef.current = op;
                     setBgOpacity(Math.min(1, s / (h * 0.4)));
                 }} className="relative w-full h-screen overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#050505] selection:bg-[#DA205A] selection:text-white">
-                    <div className="fixed inset-0 pointer-events-none z-0">
-                        <div className="absolute top-0 left-0 w-full h-[40vh] halo-top blur-[120px]" />
-                        <div className="absolute bottom-0 left-0 w-full h-[40vh] halo-bottom blur-[120px]" />
-                    </div>
                     <canvas ref={waveCanvasRef} className="fixed inset-0 w-full h-full z-0 transition-opacity duration-700 pointer-events-none" style={{ opacity: bgOpacity }} />
                     <canvas ref={heroCanvasRef} className="fixed inset-0 w-full h-full z-10 pointer-events-none" style={{ opacity: heroOpacity }} />
 
                     <main className="relative z-20">
-                        <section className="h-screen flex flex-col items-center justify-center text-center px-4">
+                        <section className="h-screen flex flex-col items-center justify-center text-center">
                             <h1 className="font-sans font-black text-[10vw] text-white uppercase leading-none">作品集<br/><span style={{color: THEME.primary}}>网站</span></h1>
                             <p className="font-mono text-gray-300 mt-8 tracking-[0.5em] text-lg uppercase">{typedText}_</p>
                         </section>
-
                         <section id="about" className="min-h-screen py-32 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 lg:gap-20">
                             <div className="md:col-span-4 sticky top-32">
                                 <div className="glass-panel p-8 rounded-3xl text-center flex flex-col items-center gap-6">
-                                    <div className="w-40 h-52 rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-white/5">
-                                        <img src="./zheng-jian-zhao.jpg" className="w-full h-full object-cover" />
-                                    </div>
+                                    <div className="w-40 h-52 rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-white/5"><img src="./zheng-jian-zhao.jpg" className="w-full h-full object-cover" /></div>
                                     <h3 className="text-3xl font-black text-white">叶湘榕</h3>
-                                    <p className="text-[#DA205A] font-mono text-xs uppercase tracking-widest font-bold">Designer / 2003.12.23</p>
-                                    <div className="w-full border-t border-white/10 pt-6">
-                                        <div className="grid grid-cols-3 gap-3">
-                                            {SOFTWARE_TOOLS.map((tool, i) => (
-                                                <div key={i} className="software-card-premium aspect-square rounded-xl flex items-center justify-center">
-                                                    <span className="font-sans font-black text-sm" style={{ color: tool.color }}>{tool.name}</span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                    <div className="grid grid-cols-3 gap-3 mt-4">
+                                        {SOFTWARE_TOOLS.map((tool, i) => (<div key={i} className="software-card-premium aspect-square rounded-xl flex items-center justify-center"><span className="font-sans font-black text-xs" style={{ color: tool.color }}>{tool.name}</span></div>))}
                                     </div>
                                 </div>
                             </div>
@@ -181,55 +165,42 @@
                                 <div className="glass-panel p-8 rounded-2xl border-l-4 border-[#DA205A]">
                                     <h4 className="text-2xl text-white font-bold mb-2">福建江夏学院 | 艺术设计学</h4>
                                     <p className="text-gray-500 font-mono mb-4 text-sm">2022.9 - 2026.6</p>
-                                    <p className="text-gray-400 text-sm leading-relaxed font-mono">主修课程：设计调研方法、消费者行为学、空间信息可视化、设计市场与企业考察。</p>
+                                    <p className="text-gray-400 text-sm leading-relaxed">主修：设计调研方法、消费者行为学、空间信息可视化。</p>
                                 </div>
                                 <h2 className="text-5xl font-black text-[#DA205A] uppercase tracking-tighter mt-10">专业技能</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                    {SKILL_SYSTEM.map((skill, i) => (
-                                        <div key={i} className="glass-panel p-6 rounded-2xl border-white/5">
-                                            <h5 className="font-sans font-bold text-[#DA205A] text-sm uppercase mb-2">{skill.title}</h5>
-                                            <p className="font-mono text-xs text-gray-400 leading-relaxed">{skill.details}</p>
-                                        </div>
-                                    ))}
+                                    {SKILL_SYSTEM.map((skill, i) => (<div key={i} className="glass-panel p-6 rounded-2xl"><h5 className="text-[#DA205A] font-bold text-sm uppercase mb-2">{skill.title}</h5><p className="text-gray-400 text-xs font-mono">{skill.details}</p></div>))}
                                 </div>
                             </div>
                         </section>
-
                         <section id="work" className="py-32 px-6 md:px-12 max-w-7xl mx-auto">
                             <h2 className="text-6xl md:text-8xl font-black text-white uppercase mb-20 tracking-tighter">精选作品.</h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 {PROJECTS.map(p => (
                                     <div key={p.id} onClick={() => setSelectedProject(p)} className="glass-panel rounded-2xl overflow-hidden cursor-pointer group shadow-2xl transition-all hover:scale-[1.02]">
-                                        <div className="h-60 overflow-hidden">
-                                            <img src={p.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                        </div>
-                                        <div className="p-6 bg-[#0a0a0a]">
-                                            <h3 className="text-white font-bold text-xl mb-1">{p.title}</h3>
-                                            <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">{p.desc}</p>
-                                        </div>
+                                        <div className="h-60 overflow-hidden"><img src={p.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" /></div>
+                                        <div className="p-6 bg-[#0a0a0a]"><h3 className="text-white font-bold text-xl mb-1">{p.title}</h3><p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">{p.desc}</p></div>
                                     </div>
                                 ))}
                             </div>
                         </section>
-
-                        <footer id="contact" className="py-32 border-t border-white/5 flex flex-col items-center">
-                            <h2 className="text-center text-4xl font-black text-white mb-16 uppercase tracking-widest">联系我</h2>
+                        <footer id="contact" className="py-32 border-t border-white/5 text-center">
+                            <h2 className="text-4xl font-black text-white mb-16 tracking-widest uppercase">联系我</h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
                                 {[ { label: 'Phone', val: '13655004586' }, { label: 'Email', val: '13655004586@163.com' }, { label: 'WeChat', val: 'kotove03012' } ].map((item, i) => (
-                                    <div key={i} className="glass-panel p-8 rounded-3xl text-center hover:bg-white/10 transition-transform hover:-translate-y-2">
+                                    <div key={i} className="glass-panel p-8 rounded-3xl">
                                         <span className="text-gray-500 font-mono text-[10px] uppercase tracking-widest">{item.label}</span>
                                         <div className="text-white font-bold text-lg mt-2 break-all">{item.val}</div>
                                     </div>
                                 ))}
                             </div>
-                            <p className="text-gray-600 font-mono text-[10px] uppercase tracking-[0.3em] mt-24 text-center">© 2026 YE XIANG RONG</p>
                         </footer>
                     </main>
 
                     {selectedProject && (
                         <div className="fixed inset-0 z-[100] flex justify-center items-center p-0 md:p-12">
                             <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl" onClick={() => setSelectedProject(null)}></div>
-                            <div className="relative w-full max-w-6xl h-full bg-[#050505] overflow-y-auto custom-scrollbar border-x border-white/5 rounded-2xl shadow-2xl">
+                            <div className="relative w-full max-w-6xl h-full bg-[#050505] overflow-y-auto custom-scrollbar border border-white/10 rounded-2xl shadow-2xl">
                                 <div className="p-8 md:p-16">
                                     <h2 className="text-4xl md:text-5xl font-black text-white mb-8">{selectedProject.title}</h2>
                                     {!selectedProject.customSections ? (
@@ -237,22 +208,16 @@
                                             {selectedProject.detailImages.map((img, i) => <img key={i} src={img} className="w-full rounded-xl shadow-2xl" loading="lazy" />)}
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col w-full pb-10 gap-20">
+                                        <div className="flex flex-col gap-20 pb-10">
                                             {selectedProject.customSections.map((sec, i) => (
                                                 <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                                                    <div className="flex flex-col items-center relative">
-                                                        <div className={`w-full ${sec.layout.includes('scroll') ? 'h-[65vh]' : 'h-auto'} bg-[#0a0a0a] rounded-3xl border border-white/5 overflow-y-auto hide-scrollbar shadow-2xl`}>
-                                                            <img src={sec.imageUrl} className="w-full h-auto block" loading="lazy" />
-                                                        </div>
-                                                        {sec.layout.includes('scroll') && <span className="mt-4 font-mono text-[10px] text-gray-500 tracking-widest animate-pulse">↓ 下滑查看长图内容</span>}
+                                                    <div className="bg-[#0a0a0a] rounded-3xl border border-white/5 overflow-y-auto h-[60vh] hide-scrollbar">
+                                                        <img src={sec.imageUrl} className="w-full h-auto block" loading="lazy" />
                                                     </div>
                                                     <div>
                                                         <h4 className="font-sans font-black text-3xl uppercase mb-6" style={{color: sec.titleColor}}>{sec.subTitle}</h4>
                                                         <p className="text-gray-400 font-mono leading-loose mb-8 text-lg">{sec.desc}</p>
-                                                        <div className="pt-6 border-t border-white/10 flex flex-col gap-4">
-                                                            <div className="flex items-center gap-4"><span className="text-xs text-gray-500 font-mono uppercase w-12">Role</span><span className="text-white font-bold">{sec.role}</span></div>
-                                                            <div className="flex items-center gap-4"><span className="text-xs text-gray-500 font-mono uppercase w-12">Color</span><div className="flex gap-2">{sec.colors.map(c=><div key={c} className="w-6 h-6 rounded-full border border-white/20" style={{backgroundColor:c}}></div>)}</div></div>
-                                                        </div>
+                                                        <div className="text-white font-bold">Role: {sec.role}</div>
                                                     </div>
                                                 </div>
                                             ))}
