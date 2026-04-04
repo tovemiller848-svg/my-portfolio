@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>叶湘榕 | 个人作品集</title>
@@ -48,6 +48,11 @@
         @keyframes breathe { 0%, 100% { opacity: 0.15; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.05); } }
         .halo-top { background: conic-gradient(from 180deg at 50% 0%, transparent 0deg, rgba(218, 32, 90, 0.2) 90deg, transparent 180deg); animation: breathe 10s ease-in-out infinite; }
         .halo-bottom { background: conic-gradient(from 0deg at 50% 100%, transparent 0deg, rgba(218, 32, 90, 0.2) 90deg, transparent 180deg); animation: breathe 10s ease-in-out infinite reverse; }
+
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            #cursor { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -55,7 +60,6 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
-
         const THEME = { bg: '#050505', primary: '#DA205A', primaryRGB: '218, 32, 90' };
 
         const SOFTWARE_TOOLS = [
@@ -129,12 +133,10 @@
             const [typedText, setTypedText] = useState('');
             const [selectedProject, setSelectedProject] = useState(null);
             const interactionRef = useRef({ x: -1000, y: -1000, ndcX: 0, ndcY: 0, active: false });
-            
             const opacityRef = useRef(1);
 
             useEffect(() => {
-                let i = 0;
-                const full = "艺术设计学";
+                let i = 0; const full = "艺术设计学";
                 const timer = setInterval(() => {
                     setTypedText(full.slice(0, i)); i++;
                     if(i > full.length) clearInterval(timer);
@@ -151,6 +153,7 @@
                 setBgOpacity(Math.min(1, s / (h * 0.4)));
             };
 
+            // 星空粒子
             useEffect(() => {
                 const canvas = heroCanvasRef.current;
                 const ctx = canvas.getContext('2d', { alpha: true });
@@ -169,8 +172,11 @@
                 }
                 sctx.fill();
 
+                const isMobile = window.innerWidth < 768;
+                const particleCount = isMobile ? 150 : 800; // 手机端减负
+
                 const points = [];
-                for (let i = 0; i < 800; i++) {
+                for (let i = 0; i < particleCount; i++) {
                     const radius = 450 * Math.cbrt(Math.random());
                     const theta = Math.random() * Math.PI * 2;
                     const phi = Math.acos(Math.random() * 2 - 1);
@@ -188,6 +194,7 @@
                 window.addEventListener('resize', resize); resize();
 
                 const handleMouseMove = (e) => {
+                    if (isMobile) return;
                     interactionRef.current = { 
                         x: e.clientX, y: e.clientY, 
                         ndcX: (e.clientX / width) * 2 - 1, 
@@ -240,7 +247,7 @@
                         const x = p.wx * sc + width/2, y = p.wy * sc + height/2;
                         const twinkle = 0.5 + 0.5 * Math.sin(Date.now()*0.002 + p.phase);
                         ctx.globalAlpha = Math.max(0, Math.min(1, (sc - 0.1) * 1.2)) * twinkle * opacityRef.current;
-                        const sz = p.sizeBase * sc * 2.5;
+                        const sz = p.sizeBase * sc * (isMobile ? 1.8 : 2.5);
                         ctx.drawImage(starCanvas, x - sz/2, y - sz/2, sz, sz);
                     });
                     animationId = requestAnimationFrame(render);
@@ -253,6 +260,7 @@
                 };
             }, []); 
 
+            // 环境波浪（保留）
             useEffect(() => {
                 const canvas = waveCanvasRef.current;
                 const ctx = canvas.getContext('2d');
@@ -289,30 +297,30 @@
                     <canvas ref={waveCanvasRef} className="fixed inset-0 w-full h-full z-0 transition-opacity duration-700 pointer-events-none" style={{ opacity: bgOpacity }} />
                     <canvas ref={heroCanvasRef} className="fixed inset-0 w-full h-full z-10 transition-opacity duration-500 pointer-events-none transform-gpu" style={{ opacity: heroOpacity }} />
 
-                    <div className="fixed top-0 left-0 w-full p-8 z-40 flex justify-between items-center mix-blend-difference">
-                        <h2 className="font-sans font-black text-white text-xl uppercase tracking-widest flex items-center gap-3">
+                    <div className="fixed top-0 left-0 w-full p-4 md:p-8 z-40 flex justify-between items-center mix-blend-difference">
+                        <h2 className="font-sans font-black text-white text-base md:text-xl uppercase tracking-widest flex items-center gap-2 md:gap-3">
                             <span className="w-2 h-2 rounded-full bg-[#DA205A] animate-pulse"></span>Portfolio
                         </h2>
-                        <nav className="flex gap-8 font-mono text-xs text-gray-400">
+                        <nav className="flex gap-4 md:gap-8 font-mono text-[10px] md:text-xs text-gray-400">
                             <a href="#about" className="hover:text-[#DA205A]">关于我</a>
-                            <a href="#work" className="hover:text-[#DA205A]">精选作品</a>
-                            <a href="#contact" className="hover:text-[#DA205A]">联系我</a>
+                            <a href="#work" className="hover:text-[#DA205A]">作品</a>
+                            <a href="#contact" className="hover:text-[#DA205A]">联系</a>
                         </nav>
                     </div>
 
                     <main className="relative z-20">
                         <section className="h-screen flex flex-col items-center justify-center text-center px-4">
-                            <h1 className="font-sans font-black text-[10vw] leading-none text-white uppercase drop-shadow-2xl">个人作品集<br/><span style={{color: THEME.primary, textShadow: '0 0 30px rgba(218,32,90,0.5)'}}>网站</span></h1>
-                            <p className="font-mono text-gray-300 mt-8 tracking-[0.5em] text-lg uppercase">{typedText}_</p>
+                            <h1 className="font-sans font-black text-[15vw] md:text-[10vw] leading-none text-white uppercase drop-shadow-2xl">个人作品集<br/><span style={{color: THEME.primary, textShadow: '0 0 30px rgba(218,32,90,0.5)'}}>网站</span></h1>
+                            <p className="font-mono text-gray-300 mt-8 tracking-[0.3em] md:tracking-[0.5em] text-sm md:text-lg uppercase">{typedText}_</p>
                         </section>
 
-                        <section id="about" className="min-h-screen py-32 px-6 md:px-12 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20">
+                        <section id="about" className="min-h-screen py-20 md:py-32 px-6 md:px-12 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
                             <div className="lg:col-span-4">
-                                <div className="sticky top-32 glass-panel p-8 rounded-3xl text-center flex flex-col items-center gap-6">
-                                    <div className="w-40 h-52 rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-white/5">
+                                <div className="lg:sticky lg:top-32 glass-panel p-6 md:p-8 rounded-3xl text-center flex flex-col items-center gap-6">
+                                    <div className="w-32 h-44 md:w-40 md:h-52 rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-white/5">
                                         <img src="./zheng-jian-zhao.jpg" className="w-full h-full object-cover" />
                                     </div>
-                                    <h3 className="font-sans font-black text-3xl text-white tracking-tight">叶湘榕</h3>
+                                    <h3 className="font-sans font-black text-2xl md:text-3xl text-white tracking-tight">叶湘榕</h3>
                                     <div className="flex gap-2">
                                         <span className="px-3 py-1 bg-white/5 rounded text-[10px] text-gray-300 font-mono border border-white/10">2003.12.23</span>
                                         <span className="px-3 py-1 bg-white/5 rounded text-[10px] text-gray-300 font-sans border border-white/10">中共党员</span>
@@ -320,11 +328,11 @@
                                     <p className="text-xs text-gray-400 leading-relaxed text-left font-mono px-2">具备校园运营模拟经验，擅长用户需求洞察、活动策划与数据分析。有公众号运营、供应商对接、数据复盘的完整项目经历。</p>
                                     
                                     <div className="w-full border-t border-white/10 pt-6 mt-2">
-                                        <h4 className="font-mono text-[10px] font-bold text-gray-500 tracking-widest uppercase mb-4">SOFTWARE TOOLS / 软件工具集</h4>
-                                        <div className="grid grid-cols-3 gap-3">
+                                        <h4 className="font-mono text-[9px] md:text-[10px] font-bold text-gray-500 tracking-widest uppercase mb-4">SOFTWARE TOOLS / 软件工具集</h4>
+                                        <div className="grid grid-cols-3 gap-2 md:gap-3">
                                             {SOFTWARE_TOOLS.map((tool, idx) => (
                                                 <div key={idx} className="software-card-premium aspect-square rounded-xl flex items-center justify-center pointer-events-auto">
-                                                    <span className="font-sans font-black text-lg" style={{ color: tool.color, textShadow: `0 0 10px ${tool.shadow}` }}>{tool.name}</span>
+                                                    <span className="font-sans font-black text-base md:text-lg" style={{ color: tool.color, textShadow: `0 0 10px ${tool.shadow}` }}>{tool.name}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -332,39 +340,39 @@
                                 </div>
                             </div>
 
-                            <div className="lg:col-span-8 flex flex-col gap-10">
-                                <h2 className="text-5xl font-black text-[#DA205A] uppercase tracking-tighter">个人简介</h2>
+                            <div className="lg:col-span-8 flex flex-col gap-8 md:gap-10">
+                                <h2 className="text-4xl md:text-5xl font-black text-[#DA205A] uppercase tracking-tighter">个人简介</h2>
                                 
-                                <div className="glass-panel p-8 md:p-10 rounded-3xl border-l-4 border-[#DA205A]">
-                                    <div className="flex flex-col md:flex-row justify-between items-baseline gap-4 mb-6">
-                                        <div className="flex flex-col md:flex-row md:items-center gap-4">
-                                            <h4 className="text-2xl text-white font-bold tracking-tight">福建江夏学院</h4>
-                                            <span className="text-gray-400 text-lg font-mono">艺术设计学</span>
+                                <div className="glass-panel p-6 md:p-10 rounded-3xl border-l-4 border-[#DA205A]">
+                                    <div className="flex flex-col md:flex-row justify-between items-baseline gap-2 md:gap-4 mb-4 md:mb-6">
+                                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                                            <h4 className="text-xl md:text-2xl text-white font-bold tracking-tight">福建江夏学院</h4>
+                                            <span className="text-gray-400 text-base md:text-lg font-mono">艺术设计学</span>
                                         </div>
-                                        <span className="font-mono text-gray-500">2022.9 - 2026.6</span>
+                                        <span className="font-mono text-[10px] md:text-sm text-gray-500">2022.9 - 2026.6</span>
                                     </div>
-                                    <p className="text-gray-300 font-mono leading-relaxed">主修课程：设计市场与企业考察、设计调研方法、消费者行为学、空间信息可视化</p>
+                                    <p className="text-sm md:text-base text-gray-300 font-mono leading-relaxed">主修课程：设计市场与企业考察、设计调研方法、消费者行为学、空间信息可视化</p>
                                 </div>
 
-                                <div className="glass-panel p-8 md:p-10 rounded-3xl border-l-4 border-[#DA205A]/40 relative overflow-hidden group">
-                                    <h4 className="text-xl text-white font-bold mb-6 flex items-center gap-3">
+                                <div className="glass-panel p-6 md:p-10 rounded-3xl border-l-4 border-[#DA205A]/40 relative overflow-hidden group">
+                                    <h4 className="text-lg md:text-xl text-white font-bold mb-4 md:mb-6 flex items-center gap-3">
                                         <span className="w-1.5 h-1.5 rounded-full bg-[#DA205A]"></span>
                                         公众号运营及设计
                                     </h4>
-                                    <p className="font-mono text-base text-gray-300 leading-relaxed">
+                                    <p className="font-mono text-sm md:text-base text-gray-300 leading-relaxed">
                                         基于数据监测调整策略，策划 <span className="text-white font-bold">3</span> 场线上活动并统筹 <span className="text-white font-bold">10+</span> 项跨部门任务，在应对突发事件中提升应变能力，实现粉丝增长 <span style={{ color: THEME.primary }} className="font-bold underline decoration-2 underline-offset-8">15%</span>、互动率提升 <span style={{ color: THEME.primary }} className="font-bold underline decoration-2 underline-offset-8">25%</span>。
                                     </p>
                                 </div>
 
                                 <div className="flex flex-col gap-6 mt-4">
-                                    <h4 className="font-sans font-black text-2xl text-white uppercase tracking-tight flex items-center gap-3">
+                                    <h4 className="font-sans font-black text-xl md:text-2xl text-white uppercase tracking-tight flex items-center gap-3">
                                         <span className="w-1.5 h-1.5 bg-[#DA205A]"></span>专业技能体系
                                     </h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                                         {SKILL_SYSTEM.items.map((skill, idx) => (
-                                            <div key={idx} className="glass-panel p-6 rounded-2xl hover:bg-white/10 transition-colors border-white/5">
-                                                <h5 className="font-sans font-bold text-[#DA205A] text-sm uppercase mb-2">{skill.title}</h5>
-                                                <p className="font-mono text-xs text-gray-400 leading-relaxed">{skill.details}</p>
+                                            <div key={idx} className="glass-panel p-5 md:p-6 rounded-2xl hover:bg-white/10 transition-colors border-white/5">
+                                                <h5 className="font-sans font-bold text-[#DA205A] text-[12px] md:text-sm uppercase mb-2">{skill.title}</h5>
+                                                <p className="font-mono text-[10px] md:text-xs text-gray-400 leading-relaxed">{skill.details}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -372,16 +380,16 @@
                             </div>
                         </section>
 
-                        <section id="work" className="py-32 px-6 md:px-12 max-w-7xl mx-auto">
-                            <h2 className="text-7xl font-black text-white uppercase mb-20 tracking-tighter mix-blend-plus-lighter">精选<br/>作品.</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <section id="work" className="py-20 md:py-32 px-6 md:px-12 max-w-7xl mx-auto">
+                            <h2 className="text-5xl md:text-7xl font-black text-white uppercase mb-12 md:mb-20 tracking-tighter mix-blend-plus-lighter">精选<br/>作品.</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                                 {PROJECTS.map(p => (
                                     <div key={p.id} onClick={() => setSelectedProject(p)} className="glass-panel rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.02] transition-all duration-500 shadow-2xl transform-gpu">
-                                        <div className="h-60 overflow-hidden relative">
+                                        <div className="h-48 md:h-60 overflow-hidden relative">
                                             <img src={p.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                         </div>
-                                        <div className="p-6 bg-[#0a0a0a]">
-                                            <h3 className="text-white font-bold text-xl mb-2">{p.title}</h3>
+                                        <div className="p-5 md:p-6 bg-[#0a0a0a]">
+                                            <h3 className="text-white font-bold text-lg md:text-xl mb-2">{p.title}</h3>
                                             <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">{p.desc}</p>
                                         </div>
                                     </div>
@@ -389,17 +397,17 @@
                             </div>
                         </section>
 
-                        <footer id="contact" className="py-32 border-t border-white/5 flex flex-col items-center">
-                            <h2 className="text-4xl font-black text-white mb-16 uppercase tracking-widest">联系我</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl px-12">
+                        <footer id="contact" className="py-20 md:py-32 border-t border-white/5 flex flex-col items-center">
+                            <h2 className="text-3xl md:text-4xl font-black text-white mb-12 md:mb-16 uppercase tracking-widest">联系我</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full max-w-6xl px-8 md:px-12">
                                 {[
                                     { label: 'Phone', val: '13655004586' },
                                     { label: 'Email', val: '13655004586@163.com' },
                                     { label: 'WeChat', val: 'kotove03012' }
                                 ].map((item, idx) => (
-                                    <div key={idx} className="glass-panel p-10 rounded-3xl text-center hover:bg-white/10 transition-all hover:-translate-y-2">
+                                    <div key={idx} className="glass-panel p-8 md:p-10 rounded-3xl text-center hover:bg-white/10 transition-all hover:-translate-y-2">
                                         <span className="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-mono group-hover:text-[#DA205A]">{item.label}</span>
-                                        <div className="text-white font-bold text-lg mt-4 break-all font-sans">{item.val}</div>
+                                        <div className="text-white font-bold text-base md:text-lg mt-4 break-all font-sans">{item.val}</div>
                                     </div>
                                 ))}
                             </div>
@@ -409,53 +417,53 @@
                     {selectedProject && (
                         <div className="fixed inset-0 z-[100] flex justify-center items-center p-0 md:p-12">
                             <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setSelectedProject(null)}></div>
-                            <button className="absolute top-8 right-8 z-[110] text-white w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all" onClick={() => setSelectedProject(null)}>✕</button>
+                            <button className="absolute top-6 right-6 md:top-8 md:right-8 z-[110] text-white w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all" onClick={() => setSelectedProject(null)}>✕</button>
                             
                             <div className="relative w-full max-w-6xl h-full bg-[#050505] overflow-y-auto custom-scrollbar shadow-2xl transform-gpu border-x border-white/5">
-                                <div className="p-8 md:p-20">
-                                    <h2 className="text-5xl font-black text-white mb-6 tracking-tight">{selectedProject.title}</h2>
-                                    <p className="text-gray-400 text-lg mb-12 font-mono leading-relaxed">{selectedProject.desc}</p>
+                                <div className="p-6 md:p-20">
+                                    <h2 className="text-3xl md:text-5xl font-black text-white mb-4 md:mb-6 tracking-tight">{selectedProject.title}</h2>
+                                    <p className="text-gray-400 text-sm md:text-lg mb-8 md:mb-12 font-mono leading-relaxed">{selectedProject.desc}</p>
                                     
                                     {!selectedProject.customSections && (
-                                        <div className="flex flex-col gap-12 pb-24">
+                                        <div className="flex flex-col gap-8 md:gap-12 pb-20 md:pb-24">
                                             {(selectedProject.detailImages || []).map((img, i) => (
-                                                <img key={i} src={img} className="w-full rounded-2xl shadow-2xl transform-gpu block" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                                                <img key={i} src={img} className="w-full rounded-xl md:rounded-2xl shadow-2xl transform-gpu block" style={{ imageRendering: '-webkit-optimize-contrast' }} loading="lazy" />
                                             ))}
                                         </div>
                                     )}
 
                                     {selectedProject.customSections && (
-                                        <div className="flex flex-col w-full pb-24 gap-40">
+                                        <div className="flex flex-col w-full pb-20 md:pb-24 gap-24 md:gap-40">
                                             {selectedProject.customSections.map((sec, i) => {
                                                 const isScroll = sec.layout.includes('scroll');
                                                 const isImageRight = sec.layout.includes('right');
 
                                                 return (
-                                                    <div key={i} className="relative w-full grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                                                    <div key={i} className="relative w-full grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 items-center">
                                                         <div className={`flex flex-col items-center relative group ${isImageRight ? 'order-1 lg:order-2' : 'order-1 lg:order-1'}`}>
                                                             {isScroll ? (
-                                                                <div className="w-full h-[65vh] lg:h-[80vh] bg-[#0a0a0a] rounded-3xl border border-white/10 overflow-y-auto hide-scrollbar shadow-2xl relative">
-                                                                    <img src={sec.imageUrl} className="w-full h-auto block transform-gpu" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                                                                <div className="w-full h-[50vh] md:h-[80vh] bg-[#0a0a0a] rounded-2xl md:rounded-3xl border border-white/10 overflow-y-auto hide-scrollbar shadow-2xl relative">
+                                                                    <img src={sec.imageUrl} className="w-full h-auto block transform-gpu" style={{ imageRendering: '-webkit-optimize-contrast' }} loading="lazy" />
                                                                 </div>
                                                             ) : (
-                                                                <img src={sec.imageUrl} className="w-full h-auto block transform-gpu drop-shadow-[0_0_35px_rgba(255,255,255,0.1)] hover:scale-105 transition-transform duration-700" />
+                                                                <img src={sec.imageUrl} className="w-full h-auto block transform-gpu drop-shadow-[0_0_35px_rgba(255,255,255,0.1)]" loading="lazy" />
                                                             )}
-                                                            {isScroll && <span className="mt-8 font-mono text-[10px] text-gray-500 tracking-widest animate-pulse">↓ 下滑查看长图内容</span>}
-                                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 rounded-full blur-[100px] opacity-15 -z-10" style={{backgroundColor: sec.titleColor}}></div>
+                                                            {isScroll && <span className="mt-4 md:mt-8 font-mono text-[9px] md:text-[10px] text-gray-500 tracking-widest animate-pulse">↓ 下滑查看内容</span>}
+                                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 rounded-full blur-[60px] md:blur-[100px] opacity-15 -z-10" style={{backgroundColor: sec.titleColor}}></div>
                                                         </div>
 
-                                                        <div className={`flex flex-col gap-8 relative ${isImageRight ? 'order-2 lg:order-1' : 'order-2 lg:order-2'}`}>
-                                                            <span className="font-sans font-black text-6xl lg:text-[7.5rem] text-white/[0.03] uppercase tracking-tighter absolute -top-16 -left-6 pointer-events-none whitespace-nowrap z-0 select-none">{sec.engTitle}</span>
+                                                        <div className={`flex flex-col gap-6 md:gap-8 relative ${isImageRight ? 'order-2 lg:order-1' : 'order-2 lg:order-2'}`}>
+                                                            <span className="hidden md:block font-sans font-black text-6xl lg:text-[7.5rem] text-white/[0.03] uppercase tracking-tighter absolute -top-16 -left-6 pointer-events-none whitespace-nowrap z-0 select-none">{sec.engTitle}</span>
                                                             <div className="z-10 relative">
-                                                                <h4 className="font-sans font-black text-2xl md:text-3xl tracking-widest uppercase mb-4" style={{color: sec.titleColor, textShadow: `0 0 20px ${sec.titleColor}60` }}>{sec.subTitle}</h4>
-                                                                <h3 className="text-5xl lg:text-6xl font-black text-white mb-8 tracking-tighter leading-tight">{sec.title}</h3>
-                                                                <p className="text-gray-400 font-mono leading-loose mb-12 text-lg">{sec.desc}</p>
+                                                                <h4 className="font-sans font-black text-xl md:text-3xl tracking-widest uppercase mb-3 md:mb-4" style={{color: sec.titleColor, textShadow: `0 0 20px ${sec.titleColor}60` }}>{sec.subTitle}</h4>
+                                                                <h3 className="text-3xl md:text-6xl font-black text-white mb-4 md:mb-8 tracking-tighter leading-tight">{sec.title}</h3>
+                                                                <p className="text-gray-400 font-mono leading-relaxed md:leading-loose mb-6 md:mb-12 text-sm md:text-lg">{sec.desc}</p>
                                                                 
-                                                                <div className="pt-10 border-t border-white/10 flex flex-col gap-8">
-                                                                    <div className="flex items-center gap-8"><span className="text-[10px] text-gray-500 uppercase font-mono w-24 tracking-[0.2em]">Role</span><span className="text-white font-bold text-lg">{sec.role}</span></div>
-                                                                    <div className="flex items-center gap-8"><span className="text-[10px] text-gray-500 uppercase font-mono w-24 tracking-[0.2em]">Color</span>
-                                                                        <div className="flex gap-4">
-                                                                            {sec.colors.map(c=><div key={c} className="w-9 h-9 rounded-full border-2 border-white/20 shadow-xl" style={{backgroundColor:c, boxShadow: `0 8px 25px ${c}50`}}></div>)}
+                                                                <div className="pt-6 md:pt-10 border-t border-white/10 flex flex-col gap-6 md:gap-8">
+                                                                    <div className="flex items-center gap-6 md:gap-8"><span className="text-[9px] md:text-[10px] text-gray-500 uppercase font-mono w-16 md:w-24 tracking-[0.2em]">Role</span><span className="text-white font-bold text-sm md:text-lg">{sec.role}</span></div>
+                                                                    <div className="flex items-center gap-6 md:gap-8"><span className="text-[9px] md:text-[10px] text-gray-500 uppercase font-mono w-16 md:w-24 tracking-[0.2em]">Color</span>
+                                                                        <div className="flex gap-3 md:gap-4">
+                                                                            {sec.colors.map(c=><div key={c} className="w-6 h-6 md:w-9 md:h-9 rounded-full border border-white/20 shadow-xl" style={{backgroundColor:c, boxShadow: `0 8px 25px ${c}50`}}></div>)}
                                                                         </div>
                                                                     </div>
                                                                 </div>
