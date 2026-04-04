@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>叶湘榕 | 个人作品集</title>
     
     <script src="https://cdn.staticfile.org/react/18.2.0/umd/react.production.min.js"></script>
@@ -22,6 +24,7 @@
             backdrop-filter: blur(25px); 
             -webkit-backdrop-filter: blur(25px); 
             border: 1px solid rgba(255, 255, 255, 0.06); 
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
         .software-card-premium {
@@ -36,9 +39,15 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #050505; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #DA205A; border-radius: 10px; }
         
         .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes breathe { 0%, 100% { opacity: 0.15; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.05); } }
+        .halo-top { background: conic-gradient(from 180deg at 50% 0%, transparent 0deg, rgba(218, 32, 90, 0.2) 90deg, transparent 180deg); animation: breathe 10s ease-in-out infinite; }
+        .halo-bottom { background: conic-gradient(from 0deg at 50% 100%, transparent 0deg, rgba(218, 32, 90, 0.2) 90deg, transparent 180deg); animation: breathe 10s ease-in-out infinite reverse; }
 
         @media (max-width: 768px) {
             body { cursor: auto; }
@@ -53,7 +62,6 @@
         const { useState, useEffect, useRef } = React;
         const THEME = { bg: '#050505', primary: '#DA205A' };
 
-        // 1. 完整找回所有数据
         const SOFTWARE_TOOLS = [
             { name: 'Ps', color: '#31A8FF', shadow: 'rgba(49, 168, 255, 0.3)' },
             { name: 'Ai', color: '#FF9A00', shadow: 'rgba(255, 154, 0, 0.3)' },
@@ -71,8 +79,14 @@
         ];
 
         const PROJECTS = [
-            { id: 1, title: '品牌ip形象设计', img: './yunda_cover.jpg', desc: 'Ps/Gemini/Lovart', detailImages: ['./yunda_cover.jpg', './yunda_2.jpg', './yunda_3.jpg', './yunda_4.jpg', './yunda_5.jpg', './yunda_6.jpg', './yunda_7.jpg', './yunda_8.jpg'] },
-            { id: 2, title: '企业宣传手册设计', img: './layout-1.jpg', desc: 'Ps/Deepseek', detailImages: ['./layout-1.jpg', './layout-2.jpg', './layout-3.jpg', './layout-4.jpg', './layout-5.jpg', './layout-6.jpg'] },
+            { 
+                id: 1, title: '品牌ip形象设计', img: './yunda_cover.jpg', desc: 'Ps/Gemini/Lovart',
+                detailImages: ['./yunda_cover.jpg', './yunda_2.jpg', './yunda_3.jpg', './yunda_4.jpg', './yunda_5.jpg', './yunda_6.jpg', './yunda_7.jpg', './yunda_8.jpg'] 
+            },
+            { 
+                id: 2, title: '企业宣传手册设计', img: './layout-1.jpg', desc: 'Ps/Deepseek',
+                detailImages: ['./layout-1.jpg', './layout-2.jpg', './layout-3.jpg', './layout-4.jpg', './layout-5.jpg', './layout-6.jpg'] 
+            },
             { 
                 id: 3, title: '公众号运营', img: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1000&auto=format&fit=crop', desc: '可画/秀米/135编辑器',
                 customSections: [
@@ -91,20 +105,31 @@
             const opacityRef = useRef(1);
             const interactionRef = useRef({ x: -1000, y: -1000, ndcX: 0, ndcY: 0, active: false });
 
-            // 打字机效果
             useEffect(() => {
                 let i = 0; const full = "艺术设计学";
                 const timer = setInterval(() => { setTypedText(full.slice(0, i)); i++; if(i > full.length) clearInterval(timer); }, 150);
                 return () => clearInterval(timer);
             }, []);
 
-            // 高性能粒子交互系统（找回星星灵魂）
             useEffect(() => {
                 const canvas = heroCanvasRef.current;
                 const ctx = canvas.getContext('2d');
                 let width, height;
                 const isMobile = window.innerWidth < 768;
                 const particleCount = isMobile ? 150 : 800;
+
+                const starCanvas = document.createElement('canvas');
+                starCanvas.width = 40; starCanvas.height = 40;
+                const sctx = starCanvas.getContext('2d');
+                sctx.fillStyle = THEME.primary;
+                sctx.beginPath();
+                const cx=20, cy=20, or=18, ir=7; let rot = Math.PI/2*3, step=Math.PI/5;
+                sctx.moveTo(cx, cy-or);
+                for(let i=0;i<5;i++){
+                    sctx.lineTo(cx+Math.cos(rot)*or, cy+Math.sin(rot)*or); rot+=step;
+                    sctx.lineTo(cx+Math.cos(rot)*ir, cy+Math.sin(rot)*ir); rot+=step;
+                }
+                sctx.fill();
 
                 const points = [];
                 for (let i = 0; i < particleCount; i++) {
@@ -113,7 +138,7 @@
                     const phi = Math.acos(Math.random() * 2 - 1);
                     points.push({ 
                         ox: radius * Math.sin(phi) * Math.cos(theta), oy: radius * Math.sin(phi) * Math.sin(theta), oz: radius * Math.cos(phi),
-                        wx: 0, wy: 0, wz: 0, vx: 0, vy: 0, vz: 0, phase: Math.random() * Math.PI * 2, size: Math.random() * 2 + 1 
+                        wx: 0, wy: 0, wz: 0, vx: 0, vy: 0, vz: 0, phase: Math.random() * Math.PI * 2, sizeBase: Math.random() * 2.0 + 0.8 
                     });
                 }
 
@@ -133,7 +158,6 @@
                     const { x: mx, y: my, ndcX, ndcY, active } = interactionRef.current;
 
                     points.forEach(p => {
-                        // 3D 旋转计算
                         const cosY = Math.cos(angle + ndcX * 0.05), sinY = Math.sin(angle + ndcX * 0.05);
                         const cosX = Math.cos(ndcY * 0.05), sinX = Math.sin(ndcY * 0.05);
                         let tx = p.ox * cosY - p.oz * sinY;
@@ -141,10 +165,8 @@
                         let ty = p.oy * cosX - tz * sinX;
                         let finalZ = p.oy * sinX + tz * cosX;
 
-                        // 弹性跟随
                         p.vx += (tx - p.wx) * 0.02; p.vy += (ty - p.wy) * 0.02; p.vz += (finalZ - p.wz) * 0.02;
                         
-                        // 鼠标避让交互
                         if (active && !isMobile) {
                             const sc = fov / (fov + p.wz);
                             const sx = p.wx * sc + width/2, sy = p.wy * sc + height/2;
@@ -162,9 +184,10 @@
 
                         const sc = fov / (fov + p.wz);
                         const x = p.wx * sc + width/2, y = p.wy * sc + height/2;
-                        ctx.globalAlpha = Math.max(0, opacityRef.current * (sc - 0.2));
-                        ctx.fillStyle = THEME.primary;
-                        ctx.fillRect(x, y, p.size * sc, p.size * sc);
+                        const twinkle = 0.5 + 0.5 * Math.sin(Date.now()*0.002 + p.phase);
+                        ctx.globalAlpha = Math.max(0, Math.min(1, (sc - 0.1) * 1.2)) * twinkle * opacityRef.current;
+                        const sz = p.sizeBase * sc * 2.5;
+                        ctx.drawImage(starCanvas, x - sz/2, y - sz/2, sz, sz);
                     });
                     requestAnimationFrame(render);
                 };
@@ -173,64 +196,66 @@
             }, []);
 
             return (
-                <div onScroll={(e) => { const op = Math.max(0, 1 - e.target.scrollTop / 500); setHeroOpacity(op); opacityRef.current = op; }} className="relative w-full h-screen overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#050505]">
-                    <canvas ref={heroCanvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-10" />
+                <div onScroll={(e) => { const op = Math.max(0, 1 - e.target.scrollTop / 500); setHeroOpacity(op); opacityRef.current = op; }} className="relative w-full h-screen overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#050505] selection:bg-[#DA205A] selection:text-white">
+                    <div className="fixed inset-0 pointer-events-none z-0">
+                        <div className="absolute top-0 left-0 w-full h-[40vh] halo-top blur-[120px]" />
+                        <div className="absolute bottom-0 left-0 w-full h-[40vh] halo-bottom blur-[120px]" />
+                    </div>
+                    <canvas ref={heroCanvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-10" style={{ opacity: heroOpacity }} />
                     
                     <main className="relative z-20">
                         {/* 1. 英雄页 */}
-                        <section className="h-screen flex flex-col items-center justify-center text-center px-4">
-                            <h1 className="font-sans font-black text-[10vw] text-white uppercase leading-none drop-shadow-2xl">个人作品集<br/><span style={{color: THEME.primary}}>网站</span></h1>
+                        <section className="h-screen flex flex-col items-center justify-center text-center">
+                            <h1 className="font-sans font-black text-[12vw] md:text-[10vw] text-white uppercase leading-none">个人作品集<br/><span style={{color: THEME.primary}}>网站</span></h1>
                             <p className="font-mono text-gray-300 mt-8 tracking-[0.5em] text-lg uppercase">{typedText}_</p>
                         </section>
 
-                        {/* 2. 完整关于我：头像、教育、工具、技能 */}
-                        <section className="py-24 px-6 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16">
-                            <div className="md:col-span-4 sticky top-24">
-                                <div className="glass-panel p-8 rounded-3xl text-center">
-                                    <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-6 bg-white/5 border border-white/10 shadow-2xl">
+                        {/* 2. 关于我：含照片、工具图标、技能、教育背景 */}
+                        <section id="about" className="min-h-screen py-32 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16">
+                            <div className="md:col-span-4 sticky top-32">
+                                <div className="glass-panel p-8 rounded-3xl text-center flex flex-col items-center gap-6">
+                                    <div className="w-40 h-52 rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-white/5">
                                         <img src="./zheng-jian-zhao.jpg" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-3xl font-black text-white">叶湘榕</h3>
-                                    <p className="text-[#DA205A] font-mono text-xs mt-2 uppercase tracking-widest font-bold">Designer / 2003.12.23</p>
+                                    <p className="text-[#DA205A] font-mono text-xs uppercase tracking-widest font-bold">Designer / 2003.12.23</p>
                                     
-                                    <div className="grid grid-cols-3 gap-3 mt-8">
-                                        {SOFTWARE_TOOLS.map((tool, i) => (
-                                            <div key={i} className="software-card-premium aspect-square rounded-xl flex items-center justify-center">
-                                                <span className="font-sans font-black text-sm" style={{ color: tool.color }}>{tool.name}</span>
-                                            </div>
-                                        ))}
+                                    <div className="w-full border-t border-white/10 pt-6">
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {SOFTWARE_TOOLS.map((tool, i) => (
+                                                <div key={i} className="software-card-premium aspect-square rounded-xl flex items-center justify-center">
+                                                    <span className="font-sans font-black text-sm" style={{ color: tool.color }}>{tool.name}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="md:col-span-8 flex flex-col gap-12">
-                                <div>
-                                    <h2 className="text-4xl font-black text-white mb-8 uppercase tracking-tighter border-b border-white/10 pb-4">教育背景</h2>
-                                    <div className="glass-panel p-8 rounded-2xl border-l-4 border-[#DA205A]">
-                                        <h4 className="text-2xl text-white font-bold mb-2">福建江夏学院 | 艺术设计学</h4>
-                                        <p className="text-gray-500 font-mono mb-4">2022.9 - 2026.6</p>
-                                        <p className="text-gray-400 leading-relaxed text-sm">主修课程：设计调研方法、消费者行为学、空间信息可视化、设计市场与企业考察。</p>
-                                    </div>
+                            <div className="md:col-span-8 flex flex-col gap-10">
+                                <h2 className="text-5xl font-black text-[#DA205A] uppercase tracking-tighter">教育背景</h2>
+                                <div className="glass-panel p-8 rounded-2xl border-l-4 border-[#DA205A]">
+                                    <h4 className="text-2xl text-white font-bold mb-2">福建江夏学院 | 艺术设计学</h4>
+                                    <p className="text-gray-500 font-mono mb-4 text-sm">2022.9 - 2026.6</p>
+                                    <p className="text-gray-400 text-sm leading-relaxed">主修课程：设计调研方法、消费者行为学、空间信息可视化、设计市场与企业考察。</p>
                                 </div>
-                                <div>
-                                    <h2 className="text-4xl font-black text-white mb-8 uppercase tracking-tighter border-b border-white/10 pb-4">专业技能体系</h2>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {SKILL_SYSTEM.map((skill, i) => (
-                                            <div key={i} className="glass-panel p-6 rounded-xl">
-                                                <h5 className="text-[#DA205A] font-bold mb-2 text-sm uppercase">{skill.title}</h5>
-                                                <p className="text-gray-400 text-xs font-mono">{skill.details}</p>
-                                            </div>
-                                        ))}
-                                    </div>
+                                <h2 className="text-5xl font-black text-[#DA205A] uppercase tracking-tighter mt-10">专业技能</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    {SKILL_SYSTEM.map((skill, i) => (
+                                        <div key={i} className="glass-panel p-6 rounded-2xl">
+                                            <h5 className="text-[#DA205A] font-bold text-sm uppercase mb-2">{skill.title}</h5>
+                                            <p className="text-gray-400 text-xs font-mono">{skill.details}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </section>
 
-                        {/* 3. 精选作品 */}
-                        <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
-                            <h2 className="text-6xl md:text-8xl font-black text-white uppercase mb-20 tracking-tighter mix-blend-difference">精选作品.</h2>
+                        {/* 3. 作品列表 */}
+                        <section id="work" className="py-32 px-6 md:px-12 max-w-7xl mx-auto">
+                            <h2 className="text-6xl md:text-8xl font-black text-white uppercase mb-20 tracking-tighter">精选作品.</h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 {PROJECTS.map(p => (
-                                    <div key={p.id} onClick={() => setSelectedProject(p)} className="glass-panel rounded-2xl overflow-hidden cursor-pointer group shadow-2xl transition-all hover:scale-[1.02]">
+                                    <div key={p.id} onClick={() => setSelectedProject(p)} className="glass-panel rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.02] transition-all shadow-2xl">
                                         <div className="h-60 overflow-hidden">
                                             <img src={p.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                         </div>
@@ -243,37 +268,38 @@
                             </div>
                         </section>
 
-                        {/* 4. 完整联系方式 */}
-                        <footer className="py-32 border-t border-white/5 bg-black/50">
-                            <h2 className="text-center text-4xl font-black text-white mb-16 tracking-widest">联系我</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
+                        {/* 4. 联系方式 */}
+                        <footer id="contact" className="py-32 border-t border-white/5 flex flex-col items-center">
+                            <h2 className="text-4xl font-black text-white mb-16 uppercase tracking-widest">联系我</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl px-12">
                                 {[
                                     { label: 'Phone', val: '13655004586' },
                                     { label: 'Email', val: '13655004586@163.com' },
                                     { label: 'WeChat', val: 'kotove03012' }
                                 ].map((item, i) => (
-                                    <div key={i} className="glass-panel p-8 rounded-3xl text-center hover:bg-white/10 transition-colors">
+                                    <div key={i} className="glass-panel p-8 rounded-3xl text-center">
                                         <span className="text-gray-500 font-mono text-[10px] uppercase tracking-widest">{item.label}</span>
                                         <div className="text-white font-bold text-lg mt-2 break-all">{item.val}</div>
                                     </div>
                                 ))}
                             </div>
+                            <p className="text-gray-600 font-mono text-[10px] uppercase tracking-[0.3em] mt-24">© 2026 YE XIANG RONG</p>
                         </footer>
                     </main>
 
-                    {/* 5. 详情弹窗模块 */}
+                    {/* 详情弹窗 */}
                     {selectedProject && (
-                        <div className="fixed inset-0 z-[100] flex justify-center items-center">
-                            <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl" onClick={() => setSelectedProject(null)}></div>
-                            <div className="relative w-full max-w-6xl h-[90vh] bg-[#050505] overflow-y-auto custom-scrollbar border border-white/10 rounded-2xl">
+                        <div className="fixed inset-0 z-[100] flex justify-center items-center p-0 md:p-12">
+                            <div className="absolute inset-0 bg-black/95 backdrop-blur-xl" onClick={() => setSelectedProject(null)}></div>
+                            <div className="relative w-full max-w-6xl h-full bg-[#050505] overflow-y-auto custom-scrollbar border-x border-white/5 rounded-2xl shadow-2xl">
                                 <div className="p-8 md:p-16">
-                                    <h2 className="text-5xl font-black text-white mb-8">{selectedProject.title}</h2>
+                                    <h2 className="text-4xl md:text-5xl font-black text-white mb-8">{selectedProject.title}</h2>
                                     {!selectedProject.customSections ? (
                                         <div className="flex flex-col gap-8 pb-10">
-                                            {selectedProject.detailImages.map((img, i) => <img key={i} src={img} className="w-full rounded-xl shadow-2xl" loading="lazy" />)}
+                                            {selectedProject.detailImages.map((img, i) => <img key={i} src={img} className="w-full rounded-xl" loading="lazy" />)}
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col gap-24 pb-10">
+                                        <div className="flex flex-col gap-20 pb-10">
                                             {selectedProject.customSections.map((sec, i) => (
                                                 <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                                                     <div className="bg-[#0a0a0a] rounded-3xl border border-white/5 overflow-y-auto h-[60vh] hide-scrollbar">
@@ -282,21 +308,17 @@
                                                     <div>
                                                         <h4 className="font-sans font-black text-3xl uppercase mb-6" style={{color: sec.titleColor}}>{sec.subTitle}</h4>
                                                         <p className="text-gray-400 font-mono leading-loose mb-8 text-lg">{sec.desc}</p>
-                                                        <div className="pt-6 border-t border-white/10 flex items-center gap-4">
-                                                            <span className="text-xs text-gray-500 font-mono uppercase tracking-widest">Role:</span>
-                                                            <span className="text-white font-bold">{sec.role}</span>
-                                                        </div>
+                                                        <div className="text-white font-bold">Role: {sec.role}</div>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
                                 </div>
-                                <button className="fixed top-8 right-8 text-white text-3xl glass-panel w-12 h-12 rounded-full flex items-center justify-center z-[110]" onClick={() => setSelectedProject(null)}>✕</button>
+                                <button className="absolute top-8 right-8 text-white text-3xl" onClick={() => setSelectedProject(null)}>✕</button>
                             </div>
                         </div>
                     )}
-                    
                     <div id="cursor" className="fixed top-0 left-0 w-3 h-3 bg-[#DA205A] rounded-full pointer-events-none z-[1000] shadow-[0_0_15px_#DA205A]"></div>
                 </div>
             );
